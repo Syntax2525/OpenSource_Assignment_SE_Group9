@@ -1,70 +1,58 @@
 <?php
-require_once "includes/auth.php";
-require_once "config/db.php";
+require_once __DIR__ . '/includes/auth.php';
+require_once __DIR__ . '/config/db.php';
 
-$id = $_GET["id"];
+$id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 
-if(isset($_POST["status"])) {
-
-    $status = $_POST["status"];
-
-    $stmt = $pdo->prepare(
-        "UPDATE projects
-         SET status = ?
-         WHERE id = ?"
-    );
-
-    $stmt->execute([
-        $status,
-        $id
-    ]);
-
-    header("Location: view_projects.php");
+if ($id <= 0) {
+    header('Location: view_projects.php');
     exit();
 }
+
+$stmt = $pdo->prepare('SELECT * FROM projects WHERE id = ?');
+$stmt->execute([$id]);
+$project = $stmt->fetch();
+
+if (!$project) {
+    header('Location: view_projects.php');
+    exit();
+}
+
+if (isset($_POST['status'])) {
+    $status = $_POST['status'];
+    $stmt = $pdo->prepare('UPDATE projects SET status = ? WHERE id = ?');
+    $stmt->execute([$status, $id]);
+
+    header('Location: view_projects.php');
+    exit();
+}
+
+$pageTitle = 'Update Status';
+require_once __DIR__ . '/includes/header.php';
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Update Status</title>
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-
 <div class="container">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Update Project Status</h1>
+            <p class="subtitle">Change the status for <?= htmlspecialchars($project['project_name'], ENT_QUOTES, 'UTF-8') ?>.</p>
+        </div>
+        <a class="button secondary" href="view_projects.php">Back to Projects</a>
+    </div>
 
-<h2>Update Project Status</h2>
+    <div class="card">
+        <form method="POST" class="stacked-form">
+            <label for="status">Status</label>
+            <select id="status" name="status">
+                <option value="Pending" <?= $project['status'] === 'Pending' ? 'selected' : '' ?>>Pending</option>
+                <option value="In Progress" <?= $project['status'] === 'In Progress' ? 'selected' : '' ?>>In Progress</option>
+                <option value="Completed" <?= $project['status'] === 'Completed' ? 'selected' : '' ?>>Completed</option>
+                <option value="Cancelled" <?= $project['status'] === 'Cancelled' ? 'selected' : '' ?>>Cancelled</option>
+            </select>
 
-<form method="POST">
-
-<select name="status">
-
-<option value="Pending">
-Pending
-</option>
-
-<option value="In Progress">
-In Progress
-</option>
-
-<option value="Completed">
-Completed
-</option>
-
-<option value="Cancelled">
-Cancelled
-</option>
-
-</select>
-
-<button type="submit">
-Update Status
-</button>
-
-</form>
-
+            <button type="submit">Update Status</button>
+        </form>
+    </div>
 </div>
 
-</body>
-</html>
+<?php require_once __DIR__ . '/includes/footer.php'; ?>

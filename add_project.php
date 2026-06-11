@@ -1,85 +1,63 @@
 <?php
-require_once "includes/auth.php";
-require_once "config/db.php";
+require_once __DIR__ . '/includes/auth.php';
+require_once __DIR__ . '/config/db.php';
 
-$message = "";
+$message = '';
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $project_name = trim($_POST['project_name'] ?? '');
+    $description = trim($_POST['description'] ?? '');
+    $project_manager = trim($_POST['project_manager'] ?? '');
+    $start_date = $_POST['start_date'] ?? '';
+    $end_date = $_POST['end_date'] ?? '';
 
-    $project_name = trim($_POST["project_name"]);
-    $description = trim($_POST["description"]);
-    $project_manager = trim($_POST["project_manager"]);
-    $start_date = $_POST["start_date"];
-    $end_date = $_POST["end_date"];
-
-    $sql = "INSERT INTO projects
-            (project_name, description, project_manager, start_date, end_date)
-            VALUES
-            (?, ?, ?, ?, ?)";
-
+    $sql = 'INSERT INTO projects (project_name, description, project_manager, start_date, end_date) VALUES (?, ?, ?, ?, ?)';
     $stmt = $pdo->prepare($sql);
 
-    if ($stmt->execute([
-        $project_name,
-        $description,
-        $project_manager,
-        $start_date,
-        $end_date
-    ])) {
-        $message = "Project added successfully.";
+    if ($stmt->execute([$project_name, $description, $project_manager, $start_date, $end_date])) {
+        $message = 'Project added successfully.';
     }
 }
+
+$pageTitle = 'Add Project';
+require_once __DIR__ . '/includes/header.php';
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Add Project</title>
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-
 <div class="container">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Add New Project</h1>
+            <p class="subtitle">Capture project details and track progress.</p>
+        </div>
+    </div>
 
-<h2>Add New Project</h2>
+    <div class="card">
+        <?php if ($message !== ''): ?>
+            <div class="message success"><?= htmlspecialchars($message, ENT_QUOTES, 'UTF-8') ?></div>
+        <?php endif; ?>
 
-<p><?= $message ?></p>
+        <form method="POST" class="stacked-form">
+            <label for="project_name">Project Name</label>
+            <input id="project_name" type="text" name="project_name" placeholder="Project Name" required>
 
-<form method="POST">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" placeholder="Project Description" required></textarea>
 
-    <input type="text"
-           name="project_name"
-           placeholder="Project Name"
-           required>
+            <label for="project_manager">Project Manager</label>
+            <input id="project_manager" type="text" name="project_manager" placeholder="Project Manager" required>
 
-    <textarea name="description"
-              placeholder="Project Description"
-              required></textarea>
+            <label for="start_date">Start Date</label>
+            <input id="start_date" type="date" name="start_date" required>
 
-    <input type="text"
-           name="project_manager"
-           placeholder="Project Manager"
-           required>
+            <label for="end_date">End Date</label>
+            <input id="end_date" type="date" name="end_date" required>
 
-    <label>Start Date</label>
-    <input type="date"
-           name="start_date"
-           required>
-
-    <label>End Date</label>
-    <input type="date"
-           name="end_date"
-           required>
-
-    <button type="submit">
-        Save Project
-    </button>
-
-</form>
-
-<a href="dashboard.php">Back Dashboard</a>
-
+            <div class="page-actions">
+                <button type="submit">Save Project</button>
+                <a class="button secondary" href="dashboard.php">Back to Dashboard</a>
+            </div>
+        </form>
+    </div>
 </div>
 
-</body>
-</html>
+<?php require_once __DIR__ . '/includes/footer.php'; ?>

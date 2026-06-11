@@ -1,85 +1,62 @@
 <?php
-require_once "config/db.php";
+session_start();
 
-$message = "";
+if (!empty($_SESSION['user_id'])) {
+    header('Location: dashboard.php');
+    exit();
+}
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+require_once __DIR__ . '/config/db.php';
 
-    $fullname = trim($_POST["fullname"]);
-    $email = trim($_POST["email"]);
-    $password = password_hash(
-        $_POST["password"],
-        PASSWORD_DEFAULT
-    );
+$message = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $fullname = trim($_POST['fullname'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $password = password_hash($_POST['password'] ?? '', PASSWORD_DEFAULT);
 
     try {
-
-        $sql = "INSERT INTO users
-                (fullname,email,password)
-                VALUES
-                (:fullname,:email,:password)";
-
+        $sql = 'INSERT INTO users (fullname, email, password) VALUES (:fullname, :email, :password)';
         $stmt = $pdo->prepare($sql);
-
         $stmt->execute([
             ':fullname' => $fullname,
             ':email' => $email,
             ':password' => $password
         ]);
-
-        $message = "Registration successful";
-
-    } catch(PDOException $e) {
-
-        $message = "Email already exists";
-
+        $message = 'Registration successful';
+    } catch (PDOException $e) {
+        $message = 'Email already exists';
     }
 }
+
+$pageTitle = 'Register';
+require_once __DIR__ . '/includes/header.php';
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>User Registration</title>
-</head>
-<body>
+<div class="container">
+    <div class="card auth-card">
+        <h1 class="page-title">Create Account</h1>
+        <p class="subtitle">Register to start tracking your projects.</p>
 
-<h2>User Registration</h2>
+        <?php if ($message !== ''): ?>
+            <div class="message success"><?= htmlspecialchars($message, ENT_QUOTES, 'UTF-8') ?></div>
+        <?php endif; ?>
 
-<p><?php echo $message; ?></p>
+        <form method="POST" class="stacked-form">
+            <label for="fullname">Full Name</label>
+            <input id="fullname" type="text" name="fullname" required>
 
-<form method="POST">
+            <label for="email">Email</label>
+            <input id="email" type="email" name="email" required>
 
-    <label>Full Name</label><br>
-    <input
-        type="text"
-        name="fullname"
-        required
-    ><br><br>
+            <label for="password">Password</label>
+            <input id="password" type="password" name="password" required>
 
-    <label>Email</label><br>
-    <input
-        type="email"
-        name="email"
-        required
-    ><br><br>
+            <button type="submit">Register</button>
+        </form>
 
-    <label>Password</label><br>
-    <input
-        type="password"
-        name="password"
-        required
-    ><br><br>
+        <p class="form-link">Already have an account? <a href="login.php">Login</a></p>
+    </div>
+</div>
 
-    <button type="submit">
-        Register
-    </button>
-
-</form>
-
-<a href="login.php">
-    Login
-</a>
-
-</body>
-</html>
+<?php require_once __DIR__ . '/includes/footer.php'; ?>

@@ -1,82 +1,59 @@
 <?php
-
 session_start();
 
-require_once "config/db.php";
+if (!empty($_SESSION['user_id'])) {
+    header('Location: dashboard.php');
+    exit();
+}
 
-$message = "";
+require_once __DIR__ . '/config/db.php';
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+$message = '';
 
-    $email = $_POST["email"];
-    $password = $_POST["password"];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = trim($_POST['email'] ?? '');
+    $password = $_POST['password'] ?? '';
 
-    $stmt = $pdo->prepare(
-        "SELECT * FROM users WHERE email = ?"
-    );
-
+    $stmt = $pdo->prepare('SELECT * FROM users WHERE email = ?');
     $stmt->execute([$email]);
-
     $user = $stmt->fetch();
 
-    if (
-        $user &&
-        password_verify(
-            $password,
-            $user["password"]
-        )
-    ) {
+    if ($user && password_verify($password, $user['password'])) {
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['fullname'] = $user['fullname'];
 
-        $_SESSION["user_id"] = $user["id"];
-        $_SESSION["fullname"] = $user["fullname"];
-
-        header("Location: dashboard.php");
-        exit;
-
+        header('Location: dashboard.php');
+        exit();
     } else {
-
-        $message = "Invalid credentials";
-
+        $message = 'Invalid credentials';
     }
 }
+
+$pageTitle = 'Login';
+require_once __DIR__ . '/includes/header.php';
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Login</title>
-</head>
-<body>
+<div class="container">
+    <div class="card auth-card">
+        <h1 class="page-title">Login</h1>
+        <p class="subtitle">Access your project workspace.</p>
 
-<h2>Login</h2>
+        <?php if ($message !== ''): ?>
+            <div class="message error"><?= htmlspecialchars($message, ENT_QUOTES, 'UTF-8') ?></div>
+        <?php endif; ?>
 
-<p><?php echo $message; ?></p>
+        <form method="POST" class="stacked-form">
+            <label for="email">Email</label>
+            <input id="email" type="email" name="email" required>
 
-<form method="POST">
+            <label for="password">Password</label>
+            <input id="password" type="password" name="password" required>
 
-    <label>Email</label><br>
-    <input
-        type="email"
-        name="email"
-        required
-    ><br><br>
+            <button type="submit">Login</button>
+        </form>
 
-    <label>Password</label><br>
-    <input
-        type="password"
-        name="password"
-        required
-    ><br><br>
+        <p class="form-link">No account yet? <a href="register.php">Create one</a></p>
+    </div>
+</div>
 
-    <button type="submit">
-        Login
-    </button>
-
-</form>
-
-<a href="register.php">
-    Register
-</a>
-
-</body>
-</html>
+<?php require_once __DIR__ . '/includes/footer.php'; ?>
