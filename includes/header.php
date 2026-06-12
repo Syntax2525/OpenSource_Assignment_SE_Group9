@@ -21,6 +21,7 @@ if (session_status() === PHP_SESSION_NONE) {
                     <a href="add_project.php">Add Project</a>
                     <a href="view_projects.php">View Projects</a>
                     <a href="search_project.php">Search</a>
+                    <a href="dashboard_statistics.php">Statistics</a>
                     <a href="logout.php">Logout</a>
                 <?php else: ?>
                     <a href="index.php">Home</a>

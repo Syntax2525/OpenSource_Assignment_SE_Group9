@@ -19,6 +19,7 @@ require_once __DIR__ . '/includes/header.php';
             <a class="button" href="add_project.php">Add Project</a>
             <a class="button secondary" href="view_projects.php">View Projects</a>
             <a class="button secondary" href="search_project.php">Search Projects</a>
+            <a class="button secondary" href="dashboard_statistics.php">Statistics Dashboard</a>
             <a class="button secondary" href="logout.php">Logout</a>
         </div>
     </div>
