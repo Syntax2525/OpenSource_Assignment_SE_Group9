@@ -1,3 +1,4 @@
+
 # Software Project Tracking System
 
 ## Degree Program
@@ -26,10 +27,13 @@ The system allows users to:
 - Git
 - GitHub
 
+## Github repository link
 
+-https://github.com/Syntax2525/OpenSource_Assignment_SE_Group9
 
 
 # Git Commands Used
+
 
 ## Initialize Git Repository
 
@@ -99,11 +103,15 @@ git push origin main
 # Installation Steps
 
 ## Prerequisites
-
-* PHP 8.x
-* MySQL 8.x
-* Git
-* Docker (Optional)
+mysql was installed in docker and docker version after installation is verified using windows commandline client as shown below
+* PS C:\Users\mayenze> docker --version
+Docker version 29.2.0, build 0b9d198
+* PS C:\Users\mayenze> php -v
+PHP 8.4.21 (cli) (built: May  6 2026 09:30:51) (NTS Visual C++ 2022 x64)
+* PS C:\Users\mayenze> mysql --version
+C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe  Ver 8.0.46 for Win64 on x86_64 (MySQL Community Server - GPL)
+* PS C:\Users\mayenze> git --version
+git version 2.53.0.windows.1
 
 ## Clone Repository
 
@@ -142,3 +150,4 @@ php -S localhost:8000
 Open:
 
 http://localhost:8000
+
